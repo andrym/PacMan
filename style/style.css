@@ -1,0 +1,11 @@
+#game-tab {
+    display: grid;
+    grid-template-columns: repeat(19, 40px);
+    grid-auto-rows: 40px;
+}
+
+img {
+    position: relative;
+}
+
+img.
