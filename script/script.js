@@ -1,5 +1,5 @@
-let num = setInterval(gameTurn, 500);
-let tab = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+let num = setInterval(gameTurn, 250);
+const tabOrigin = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 [0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0],
 [0, 2, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0],
 [0, 2, 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0],
@@ -21,71 +21,75 @@ let tab = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 [0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0],
 [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
-let pacMan = {
+let tab = [];
+
+const pacManOrigin = {
     x: 1,
     y: 6,
     direction: 0
 };
-let blueGhost = {
-    x: Math.floor(tab.length / 2) - 2,
-    y: Math.floor(tab[0].length / 2) + 1,
-    dir: 1
-};
-let redGhost = {
-    x: Math.floor(tab.length / 2) - 2,
-    y: Math.floor(tab[0].length / 2) + 1,
-    dir: 3
-};
-let greenGhost = {
-    x: Math.floor(tab.length / 2) - 2,
-    y: Math.floor(tab[0].length / 2) + 1,
-    dir: 1
-};
+let pacMan;
+
+const ghostsOrigin = [{
+    x: Math.floor(tabOrigin.length / 2) - 2,
+    y: Math.floor(tabOrigin[0].length / 2) + 1,
+    dir: 1,
+    color: 'vert'
+}, {
+    x: Math.floor(tabOrigin.length / 2) - 2,
+    y: Math.floor(tabOrigin[0].length / 2) + 1,
+    dir: 3,
+    color: 'bleu'
+}, {
+    x: Math.floor(tabOrigin.length / 2) - 2,
+    y: Math.floor(tabOrigin[0].length / 2) + 1,
+    dir: 1,
+    color: 'rouge'
+}, {
+    x: Math.floor(tabOrigin.length / 2) - 2,
+    y: Math.floor(tabOrigin[0].length / 2) + 1,
+    dir: 1,
+    color: 'orange'
+}];
+let ghosts = [];
+
 let dirTab = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-let score = 0;
+let score;
+let lost;
+
+function init() {
+    for (let i in tabOrigin) {
+        tab[i] = [...tabOrigin[i]];
+    }
+    for (let i in ghostsOrigin) {
+        ghosts[i] = {...ghostsOrigin[i]};
+    }
+    pacMan = {...pacManOrigin};
+    lost = 0;
+    score = 0;
+}
+
+init();
 
 document.addEventListener('keydown', changDir);
 
-function printblueGhost() {
+function printGhost(ghost) {
     let mainDiv = document.querySelector("#game-tab");
     let ghostDiv = document.createElement("div");
-    let ghost = document.createElement("img")
+    let ghostImg = document.createElement("img")
 
-    ghostDiv.id = 'blue-ghost'
-    ghost.src = './assets/fantome_bleu1.gif';
-    ghostDiv.style.gridArea = (blueGhost.y + 1) + '/' + (blueGhost.x + 1);
-    ghostDiv.appendChild(ghost);
-    mainDiv.appendChild(ghostDiv);
-}
-
-function printredGhost() {
-    let mainDiv = document.querySelector("#game-tab");
-    let ghostDiv = document.createElement("div");
-    let ghost = document.createElement("img")
-
-    ghostDiv.id = 'red-ghost'
-    ghost.src = './assets/fantome_rouge1.gif';
-    ghostDiv.style.gridArea = (redGhost.y + 1) + '/' + (redGhost.x + 1);
-    ghostDiv.appendChild(ghost);
-    mainDiv.appendChild(ghostDiv);
-}
-
-function printgreenGhost() {
-    let mainDiv = document.querySelector("#game-tab");
-    let ghostDiv = document.createElement("div");
-    let ghost = document.createElement("img")
-
-    ghostDiv.id = 'green-ghost'
-    ghost.src = './assets/fantome_vert1.gif';
-    ghostDiv.style.gridArea = (greenGhost.y + 1) + '/' + (greenGhost.x + 1);
-    ghostDiv.appendChild(ghost);
+    ghostDiv.className = ghost.color + '-ghost';
+    ghostImg.src = './assets/fantome_' + ghost.color +  '1.gif';
+    ghostDiv.style.gridArea = (ghost.y + 1) + '/' + (ghost.x + 1);
+    ghostDiv.appendChild(ghostImg);
     mainDiv.appendChild(ghostDiv);
 }
 
 function printGhosts() {
-    printblueGhost();
-    printgreenGhost();
-    printredGhost();
+
+    ghosts.forEach(ghost => {
+        printGhost(ghost);
+    });
 }
 
 function printPacMan() {
@@ -94,7 +98,7 @@ function printPacMan() {
     let pac = document.createElement("img")
 
     pacDiv.id = 'pac-man'
-    pac.src = './assets/pacman3.gif';
+    pac.src = './assets/pacman4.gif';
     pacDiv.style.gridArea = (pacMan.y + 1) + '/' + (pacMan.x + 1);
     pacDiv.appendChild(pac);
     mainDiv.appendChild(pacDiv);
@@ -142,86 +146,68 @@ function printGrid() {
     mainDiv.appendChild(elemTab);
 }
 
-function checkDir(direction) {
-    let dX = dirTab[direction][0];
-    let dY = dirTab[direction][1];
-
-    if ((((pacMan.y + dY) < tab.length && (pacMan.y + dY) >= 0))
-        && ((pacMan.x + dX) < tab[0].length && (pacMan.x + dX) >= 0)) {
-        if (tab[pacMan.y + dY][pacMan.x + dX] != 0) {
+function checkGhost(x, y) {
+    for (let i = 0; i < ghosts.length; i++) {
+        if (ghosts[i].x == x && ghosts[i].y == y) {
             return 1;
         }
     }
     return 0;
 }
 
-function moveBlueGhost() {
-    let dX = dirTab[blueGhost.dir][0];
-    let dY = dirTab[blueGhost.dir][1];
+function checkDir(direction) {
+    let dX = pacMan.x + dirTab[direction][0];
+    let dY = pacMan.y + dirTab[direction][1];
 
-    if ((((blueGhost.y + dY) < tab.length && (blueGhost.y + dY) >= 0))
-        && ((blueGhost.x + dX) < tab[0].length && (blueGhost.x + dX) >= 0)) {
-        if (tab[blueGhost.y + dY][blueGhost.x + dX] != 0) {
-            blueGhost.x += dX;
-            blueGhost.y += dY;
-        }
-        else {
-            blueGhost.dir = Math.floor(Math.random() * 4);
-            moveBlueGhost();
+    if ((dY < tab.length && dY >= 0) && (dX < tab[0].length && dX >= 0)) {
+        if (tab[dY][dX] != 0) {
+            return 1;
         }
     }
+    return 0;
 }
 
-function moveRedGhost() {
-    let dX = dirTab[redGhost.dir][0];
-    let dY = dirTab[redGhost.dir][1];
+function moveGhost(ghost) {
+    let dX = ghost.x + dirTab[ghost.dir][0];
+    let dY = ghost.y + dirTab[ghost.dir][1];
 
-    if ((((redGhost.y + dY) < tab.length && (redGhost.y + dY) >= 0))
-        && ((redGhost.x + dX) < tab[0].length && (redGhost.x + dX) >= 0)) {
-        if (tab[redGhost.y + dY][redGhost.x + dX] != 0) {
-            redGhost.x += dX;
-            redGhost.y += dY;
+    if ((dY < tab.length && dY >= 0) && (dX < tab[0].length && dX >= 0)) {
+        if (tab[dY][dX] != 0) {
+            ghost.x = dX;
+            ghost.y = dY;
         }
         else {
-            redGhost.dir = Math.floor(Math.random() * 4);
-            moveRedGhost();
-        }
-    }
-}
-
-function moveGreenGhost() {
-    let dX = dirTab[greenGhost.dir][0];
-    let dY = dirTab[greenGhost.dir][1];
-
-    if ((((greenGhost.y + dY) < tab.length && (greenGhost.y + dY) >= 0))
-        && ((greenGhost.x + dX) < tab[0].length && (greenGhost.x + dX) >= 0)) {
-        if (tab[greenGhost.y + dY][greenGhost.x + dX] != 0) {
-            greenGhost.x += dX;
-            greenGhost.y += dY;
-        }
-        else {
-            greenGhost.dir = Math.floor(Math.random() * 4);
-            moveGreenGhost();
+            ghost.dir = Math.floor(Math.random() * 4);
+            moveGhost(ghost);
         }
     }
 }
 
 function moveGhosts() {
-    moveBlueGhost();
-    moveRedGhost();
-    moveGreenGhost();
+    ghosts.forEach(ghost => {
+        moveGhost(ghost);
+    });
 }
 
 function movePacMan() {
-    let dX = dirTab[pacMan.direction][0];
-    let dY = dirTab[pacMan.direction][1];
+    let dX = pacMan.x + dirTab[pacMan.direction][0];
+    let dY = pacMan.y + dirTab[pacMan.direction][1];
 
+    if (checkGhost(pacMan.x, pacMan.y) == 1) {
+        lost = 1;
+        return lost;
+    }
     if (checkDir(pacMan.direction) == 1) {
         if (tab[pacMan.y][pacMan.x] == 2)
             tab[pacMan.y][pacMan.x] = 1;
-        pacMan.x += dX;
-        pacMan.y += dY;
+        pacMan.x = dX;
+        pacMan.y = dY;
     }
+    if (checkGhost(dX, dY) == 1) {
+        lost = 1;
+        return lost;
+    }
+    return (0);
 }
 
 function changDir(e) {
@@ -246,7 +232,10 @@ function changDir(e) {
 }
 
 function checkWin() {
-    let win = 0;
+    if (lost == 1) {
+        alert("Perdu!");
+        return 2;
+    }
     for (let i = 0; i < tab.length; i++) {
         for (let j = 0; j < tab[i].length; j++)
             if (tab[i][j] == 2)
@@ -261,11 +250,13 @@ function printScore() {
 
 function gameTurn() {
     movePacMan();
-    moveGhosts();
+    if (lost != 1)
+        moveGhosts();
     printGrid();
     printPacMan();
     printGhosts();
     printScore();
     if (checkWin() == 2)
-        clearInterval(num);
+        init();
+    // clearInterval(num);
 }
